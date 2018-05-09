@@ -1,9 +1,10 @@
-from xlrd import open_workbook
-import os
 import csv
+import os
+
+from xlrd import open_workbook
 
 
-def file_name(file_dir):
+def file_name(file_dir):  # 获取文件夹信息
     for root, dirs, files in os.walk(file_dir):
         # print(root) #当前目录路径
         # print(dirs) #当前路径下所有子目录
@@ -11,7 +12,7 @@ def file_name(file_dir):
         return files
 
 
-def find_missing(files, xlspath):
+def find_missing(files, xlspath):  # 查找遗漏的文件项
     workbook = open_workbook(xlspath)
     booksheet = workbook.sheet_by_index(0)
     rows = booksheet.nrows
@@ -28,11 +29,12 @@ def find_missing(files, xlspath):
             print(code)
 
 
-def xls_to_csv(fpath, csvpath):
+def xls_to_csv(fpath, csvpath):  # 将Excel文件中的公司上下游抽取到csv文件中
     workbook = open_workbook(fpath)
     if '上游' in workbook.sheet_names():
         booksheet = workbook.sheet_by_name('上游')
-        if booksheet.cell_value(2, 0) == '供应商':
+        rows = booksheet.nrows
+        if booksheet.cell_value(2, 0) == '供应商' and rows >= 6:
             rows = booksheet.nrows
             name = booksheet.cell_value(0, 0)
             print(name)
@@ -54,8 +56,8 @@ def xls_to_csv(fpath, csvpath):
                     csvwriter.writerow(cell_list)
     if '下游' in workbook.sheet_names():
         booksheet = workbook.sheet_by_name('下游')
-        if booksheet.cell_value(2, 0) == '客户':
-            rows = booksheet.nrows
+        rows = booksheet.nrows
+        if booksheet.cell_value(2, 0) == '客户' and rows >= 6:
             name = booksheet.cell_value(0, 0)
             print(name)
             head = []
