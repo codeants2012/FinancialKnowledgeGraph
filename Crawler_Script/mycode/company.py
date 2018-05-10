@@ -18,7 +18,7 @@ def get_html_by_url(url):
 
 if __name__ == '__main__':
     data = []
-    with open('../data/temp.csv', 'r', newline='') as fin:
+    with open('../data/com_data_missing.csv', 'r', newline='') as fin:
         csv_reader = csv.reader(fin)
         for line in csv_reader:
             data.append(line[0])
@@ -34,7 +34,7 @@ if __name__ == '__main__':
 
         url = 'http://stockdata.stock.hexun.com/gszl/s{0}.shtml'.format(id)
         html = get_html_by_url(url)
-        soup = BeautifulSoup(html.read(), 'html.parser', from_encoding='gbk')
+        soup = BeautifulSoup(html.read(), 'html.parser', from_encoding='utf8')  # 乱码时设置：fromEncoding='gb18030'
         trs = soup.find('div', class_='xinx_l marr10').find('tbody').find_all('tr')
         mess = {}
         for tr in trs:
@@ -43,7 +43,29 @@ if __name__ == '__main__':
             value = tds[1].get_text().replace('\n', '').replace('\t', '').replace('\r', '')
             mess[key] = value
 
-        print(mess)
-        with open('../data/company.csv', 'a', newline='') as fout:
-            csv_writer = csv.writer(fout)
-            csv_writer.writerow([id, mess])
+        # print(mess)
+        with open('../../Data/company.csv', 'a', encoding='utf8', newline='') as fout:
+            csvwriter = csv.writer(fout, delimiter=';')
+            list = []
+            try:
+                dict = mess
+                list.append(dict['股票代码'])
+                list.append(dict['公司简称'])
+                list.append(dict['公司全称'])
+                list.append(dict['公司英文名称'])
+                list.append(dict['成立日期'])
+                list.append(dict['所属地域'])
+                list.append(dict['所属行业'])
+                list.append(dict['所属概念'])
+                list.append(dict['曾用名'])
+                list.append(dict['法定代表人'])
+                list.append(dict['独立董事'])
+                list.append(dict['会计师事务所'])
+                list.append(dict['证券事务代表'])
+                list.append(dict['咨询服务机构'])
+                if list[0] == '':
+                    print(id)
+                else:
+                    csvwriter.writerow(list)
+            except:
+                print(id)
