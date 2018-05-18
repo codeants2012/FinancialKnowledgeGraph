@@ -52,7 +52,7 @@ if __name__ == '__main__':
                 for i in range(len(row)):
                     data = data + row[i].replace('  ', ' ')
                 row = data.split(';')
-            l = row[0:6] + row[8:14] + [row[6]] + [row[7]]
+            l = row[0:6] + row[8:14] + [row[7]] + [row[6]]
             csvwriter.writerow(l)
             for ls in l:
                 if ';' in ls:
