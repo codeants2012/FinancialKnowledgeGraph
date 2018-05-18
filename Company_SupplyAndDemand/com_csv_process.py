@@ -52,8 +52,12 @@ if __name__ == '__main__':
                 for i in range(len(row)):
                     data = data + row[i].replace('  ', ' ')
                 row = data.split(';')
-            l = row[0:6] + row[8:14] + [row[7]] + [row[6]]
+            if row[0][0] == '6':
+                s = row[0] + '.SH'
+            elif row[0][0] == '0' or row[0][0] == '3':
+                s = row[0] + '.SZ'
+            else:
+                s = row[0]
+            l = [s] + row[1:6] + row[8:14] + [row[7]] + [row[6]]
             csvwriter.writerow(l)
-            for ls in l:
-                if ';' in ls:
-                    print(count, l)
+            print(count, l)

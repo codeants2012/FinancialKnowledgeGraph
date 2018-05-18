@@ -9,7 +9,7 @@ def file_name(file_dir):  # 获取文件夹信息
         # print(root) #当前目录路径
         # print(dirs) #当前路径下所有子目录
         # print(files) #当前路径下所有非目录子文件
-        return files
+        return files  # 返回文件列表
 
 
 def find_missing(files, xlspath):  # 查找遗漏的文件项
