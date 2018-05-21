@@ -7,7 +7,7 @@ from Company_SupplyAndDemand.com_data_extraction import file_name
 graph = Con_Neo4j(http='http://0.0.0.0:7474', username='neo4j', password='Neo4j')
 
 
-def creat_AStockAndCompany():  # 在图中创建A股股票节点、对应上市公司节点，以及它们之间的关系
+def Creat_CompanyAndAStock():  # 在图中创建上市公司节点、对应A股股票节点，以及它们之间的关系
     with open('../Data/company.csv', 'r', encoding='utf8', newline='') as csvfile:
         rows = csv.reader(csvfile, delimiter=';')
         count = -1
@@ -38,7 +38,7 @@ def creat_AStockAndCompany():  # 在图中创建A股股票节点、对应上市�
             print(count, row)
 
 
-def creat_com_UpAndDown():  # 创建公司上下游关系，如果有图中不存在的公司，则创建它
+def Creat_Com_UpAndDown():  # 创建公司上下游关系，如果有图中不存在的公司，则创建它
     file_path = '../Company_SupplyAndDemand/上市公司上下游/'
     files = file_name(file_path)
     rel_num = 0
@@ -123,6 +123,34 @@ def creat_com_UpAndDown():  # 创建公司上下游关系，如果有图中不�
                         graph.create(rel)
 
 
+def Creat_Industry():
+    with open('../Data/sec_tags.csv', 'r', encoding='utf-8', newline='') as csvfile:
+        rows = csv.reader(csvfile)
+        k = -1
+        for row in rows:
+            k += 1
+            if k == 0:
+                continue
+            com_node = graph.find_one(label='COMPANY', property_key='stock_code', property_value=row[0])
+            s_node = graph.find_one(label='STOCK', property_key='stock_code', property_value=row[0])
+            ind_node = graph.find_one(label='INDUSTRY', property_key='ind_name', property_value=row[2])
+            if not (com_node and s_node):
+                print(k, row)
+                continue
+            if not ind_node:
+                new_node = Node('INDUSTRY')
+                new_node['ind_name'] = row[2]
+                com_rel = Relationship(com_node, 'COM_BelongTo_I', new_node)
+                s_rel = Relationship(s_node, 'S_BelongTo_I', new_node)
+                graph.create(new_node | com_rel | s_rel)
+            else:
+                com_rel = Relationship(com_node, 'COM_BelongTo_I', ind_node)
+                s_rel = Relationship(s_node, 'S_BelongTo_I', ind_node)
+                graph.create(com_rel | s_rel)
+            # print(k, row)
+
+
 if __name__ == '__main__':
-    creat_AStockAndCompany()
-    creat_com_UpAndDown()
+    Creat_CompanyAndAStock()
+    Creat_Com_UpAndDown()
+    Creat_Industry()
