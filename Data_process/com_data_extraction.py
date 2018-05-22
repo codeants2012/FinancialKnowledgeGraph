@@ -34,10 +34,8 @@ def com_UAD_extraction():  # 将Excel文件中的公司上下游数据抽取到c
     files = file_name(file_path)
     count = 0
     for file in files:
-        if '.xlsx' not in file:
+        if '.xlsx' not in file or file[0] == '~':
             continue
-        count += 1
-        print(count, file)
         fpath = file_path + file
         csvpath = '../Data/A股上市公司上下游/'
         workbook = open_workbook(fpath)
@@ -45,9 +43,10 @@ def com_UAD_extraction():  # 将Excel文件中的公司上下游数据抽取到c
             booksheet = workbook.sheet_by_name('上游')
             rows = booksheet.nrows
             if booksheet.cell_value(2, 0) == '供应商' and rows >= 6:
+                count += 1
                 rows = booksheet.nrows
                 name = booksheet.cell_value(0, 0)
-                print(name)
+                print(count, name)
                 head = []
                 for i in range(4):
                     head.append(str(booksheet.cell_value(4, i)))
@@ -68,8 +67,9 @@ def com_UAD_extraction():  # 将Excel文件中的公司上下游数据抽取到c
             booksheet = workbook.sheet_by_name('下游')
             rows = booksheet.nrows
             if booksheet.cell_value(2, 0) == '客户' and rows >= 6:
+                count += 1
                 name = booksheet.cell_value(0, 0)
-                print(name)
+                print(count, name)
                 head = []
                 for i in range(4):
                     head.append(str(booksheet.cell_value(4, i)))
@@ -93,10 +93,8 @@ def com_Holding_extraction():  # 将Excel文件中的公司投资数据抽取到
     files = file_name(file_path)
     count = 0
     for file in files:
-        if '.xlsx' not in file:
+        if '.xlsx' not in file or file[0] == '~':
             continue
-        count += 1
-        print(count, file)
         fpath = file_path + file
         csvpath = '../Data/A股上市公司投资情况/'
         workbook = open_workbook(fpath)
@@ -104,9 +102,10 @@ def com_Holding_extraction():  # 将Excel文件中的公司投资数据抽取到
             booksheet = workbook.sheet_by_name('投资')
             rows = booksheet.nrows
             if booksheet.cell_value(2, 0) == '控参股' and rows >= 6:
+                count += 1
                 rows = booksheet.nrows
                 name = booksheet.cell_value(0, 0)
-                print(name)
+                print(count, name)
                 head = []
                 for i in range(4):
                     head.append(str(booksheet.cell_value(4, i)))
@@ -125,5 +124,72 @@ def com_Holding_extraction():  # 将Excel文件中的公司投资数据抽取到
                         csvwriter.writerow(cell_list)
 
 
+def com_Block_extraction():  # 将Excel文件中的所有板块数据抽取到csv文件中
+    file_path = '../Data/A股上市公司关系网/'
+    files = file_name(file_path)
+    blocks = []
+    head = ['公司名称', '股票代码', '营业总收入(万元)']
+    count = 0
+    for file in files:
+        if '.xlsx' not in file or file[0] == '~':
+            continue
+        fpath = file_path + file
+        csvpath = '../Data/板块/'
+        workbook = open_workbook(fpath)
+        if '概念' in workbook.sheet_names():
+            booksheet = workbook.sheet_by_name('概念')
+            rows = booksheet.nrows
+            if booksheet.cell_value(2, 0) != '' and rows >= 5:
+                rows = booksheet.nrows
+                name = booksheet.cell_value(0, 0)[0:-2] + '板块'
+                com_blocks = []
+                datas = []
+                block_com = ''
+                for row in range(2, rows):
+                    if booksheet.cell_value(row, 0) == '':
+                        if block_com not in blocks:
+                            blocks.append(block_com)
+                            path = csvpath + block_com + '.csv'
+                            with open(file=path, mode='w', encoding='utf8', newline='') as csvfile:
+                                csvwriter = csv.writer(csvfile, delimiter=';')
+                                csvwriter.writerow(head)
+                                k = -1
+                                for data in datas:
+                                    k += 1
+                                    if k == 0:
+                                        continue
+                                    csvwriter.writerow(data)
+                        datas = []
+                        continue
+                    elif booksheet.cell_value(row, 1) == '':
+                        block_com = booksheet.cell_value(row, 0).replace('/', '_')
+                        com_blocks.append(block_com)
+                    else:
+                        cell_list = []
+                        for i in range(3):
+                            cell_list.append(str(booksheet.cell_value(row, i)))
+                        datas.append(cell_list)
+                if block_com not in blocks:
+                    blocks.append(block_com)
+                    path = csvpath + block_com + '.csv'
+                    with open(file=path, mode='w', encoding='utf8', newline='') as csvfile:
+                        csvwriter = csv.writer(csvfile, delimiter=';')
+                        csvwriter.writerow(head)
+                        k = -1
+                        for data in datas:
+                            k += 1
+                            if k == 0:
+                                continue
+                            csvwriter.writerow(data)
+                path = '../Data/A股上市公司所属板块/' + name + '.csv'
+                with open(file=path, mode='w', encoding='utf8', newline='') as csvfile:
+                    csvwriter = csv.writer(csvfile, delimiter=';')
+                    csvwriter.writerow(['板块名称'])
+                    for b in com_blocks:
+                        csvwriter.writerow([b])
+                count += 1
+                print(count, name, com_blocks)
+
+
 if __name__ == '__main__':
-    com_Holding_extraction()
+    com_Block_extraction()

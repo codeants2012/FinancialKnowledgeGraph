@@ -1,7 +1,7 @@
 from Graph.process import Con_Neo4j
 from py2neo import Relationship, Node
 import csv
-from Company_SupplyAndDemand.com_data_extraction import file_name
+from Data_process.com_data_extraction import file_name
 
 
 graph = Con_Neo4j(http='http://0.0.0.0:7474', username='neo4j', password='Neo4j')
@@ -39,15 +39,15 @@ def Creat_CompanyAndAStock():  # 在图中创建上市公司节点、对应A股�
 
 
 def Creat_Com_UpAndDown():  # 创建公司上下游关系，如果有图中不存在的公司，则创建它
-    file_path = '../Company_SupplyAndDemand/上市公司上下游/'
+    file_path = '../Data/A股上市公司上下游/'
     files = file_name(file_path)
     rel_num = 0
     for file in files:  # 遍历文件夹中的所有A股上下游的.csv文件
         if '.csv' not in file:
             continue
         stock_code = ((file.split('['))[1].split(']'))[0]
-        if stock_code[0] not in ['0', '3', '6']:
-            continue
+        # if stock_code[0] not in ['0', '3', '6']:
+        #     continue
         node = graph.find_one(label='COMPANY', property_key='stock_code', property_value=stock_code)
         if '上游' in file:  # 上游公司
             csvpath = file_path + file
@@ -124,7 +124,7 @@ def Creat_Com_UpAndDown():  # 创建公司上下游关系，如果有图中不�
 
 
 def Creat_Industry():
-    with open('../Data/sec_tags.csv', 'r', encoding='utf-8', newline='') as csvfile:
+    with open('../Data/industry_tag.csv', 'r', encoding='utf-8', newline='') as csvfile:
         rows = csv.reader(csvfile)
         k = -1
         for row in rows:
