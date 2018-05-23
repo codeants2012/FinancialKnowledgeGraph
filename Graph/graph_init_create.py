@@ -32,6 +32,30 @@ def create_company():  # 在图中创建A股上市公司节点
             print(count, row)
 
 
+def create_industry():  # 在图中创建行业节点，以及公司与行业的关系
+    with open('../Data/industry_tags.csv', 'r', encoding='utf-8', newline='') as csvfile:
+        rows = csv.reader(csvfile)
+        k = -1
+        for row in rows:
+            k += 1
+            if k == 0:
+                continue
+            com_node = graph.find_one(label='COMPANY', property_key='stock_code', property_value=row[0])
+            ind_node = graph.find_one(label='INDUSTRY', property_key='ind_name', property_value=row[2])
+            if not com_node:
+                # print(k, row)
+                continue
+            if ind_node:
+                com_rel = Relationship(com_node, 'COM_BelongTo_I', ind_node)
+                graph.create(com_rel)
+            else:
+                new_node = Node('INDUSTRY')
+                new_node['ind_name'] = row[2]
+                com_rel = Relationship(com_node, 'COM_BelongTo_I', new_node)
+                graph.create(new_node | com_rel)
+            print(k, row)
+
+
 def create_com_output():  # 在图中创建公司产业输出关系（上下游），如果公司节点不存在则创建
     file_path = '../Data/A股上市公司上下游/'
     files = file_name(file_path)
@@ -194,3 +218,6 @@ def create_com_invest():  # 在图中创建公司投资关系，如果公司节�
 
 if __name__ == '__main__':
     create_company()
+    create_industry()
+    create_com_output()
+    create_com_invest()
