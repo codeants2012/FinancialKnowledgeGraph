@@ -12,8 +12,6 @@
 会计师事务所:acc_firm  
 证券事务代表:sec_aff_rep  
 咨询服务机构:adv_ser  
-所属板块:block_name  
-所属行业:indu_name  
 - INDUSTRY  
 行业名称:ind_name  
 ~~行业代码:ind_code~~  

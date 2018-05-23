@@ -4,10 +4,10 @@ import csv
 from Data_process.com_data_extraction import file_name
 
 
-graph = Con_Neo4j(http='http://0.0.0.0:7474', username='neo4j', password='Neo4j')
+graph = Con_Neo4j(http='http://127.0.0.1:7474', username='neo4j', password='123456')
 
 
-def Create_CompanyAndAStock():  # 在图中创建A股上市公司节点
+def create_company():  # 在图中创建A股上市公司节点
     with open('../Data/company.csv', 'r', encoding='utf8', newline='') as csvfile:
         rows = csv.reader(csvfile, delimiter=';')
         count = -1
@@ -32,7 +32,7 @@ def Create_CompanyAndAStock():  # 在图中创建A股上市公司节点
             print(count, row)
 
 
-def Create_Com_UpAndDown():  # 在图中创建公司产业输出关系（上下游），如果公司节点不存在则创建
+def create_com_output():  # 在图中创建公司产业输出关系（上下游），如果公司节点不存在则创建
     file_path = '../Data/A股上市公司上下游/'
     files = file_name(file_path)
     rel_num = 0
@@ -43,81 +43,82 @@ def Create_Com_UpAndDown():  # 在图中创建公司产业输出关系（上下�
         # if stock_code[0] not in ['0', '3', '6']:
         #     continue
         node = graph.find_one(label='COMPANY', property_key='stock_code', property_value=stock_code)
-        if '上游' in file:  # 上游公司
-            csvpath = file_path + file
-            with open(csvpath, 'r', encoding='utf8', newline='') as csvfile:
-                rows = csv.reader(csvfile, delimiter=';')
-                k = -1
-                for row in rows:
-                    k += 1
-                    if k == 0:
-                        continue
-                    rel_num += 1
-                    print(rel_num, row, '-->', stock_code)
-                    row[3] = float(row[3].replace(',', ''))
-                    if row[1] != '-':
-                        up_code = row[1]
-                        node_up = graph.find_one(label='COMPANY', property_key='stock_code', property_value=up_code)
-                        if node_up:
-                            rel = Relationship(node_up, 'COM_Output_COM', node)
-                            rel['report_dt'] = row[2]
-                            rel['output_funt'] = row[3]
-                            graph.create(rel)
+        if node:
+            if '上游' in file:  # 上游公司
+                csvpath = file_path + file
+                with open(csvpath, 'r', encoding='utf8', newline='') as csvfile:
+                    rows = csv.reader(csvfile, delimiter=';')
+                    k = -1
+                    for row in rows:
+                        k += 1
+                        if k == 0:
+                            continue
+                        rel_num += 1
+                        print(rel_num, row, '-->', stock_code)
+                        row[3] = float(row[3].replace(',', ''))
+                        if row[1] != '-':
+                            up_code = row[1]
+                            node_up = graph.find_one(label='COMPANY', property_key='stock_code', property_value=up_code)
+                            if node_up:
+                                rel = Relationship(node_up, 'COM_Output_COM', node)
+                                rel['report_dt'] = row[2]
+                                rel['output_funt'] = row[3]
+                                graph.create(rel)
+                            else:
+                                nod = Node('COMPANY')
+                                nod['com_name'] = row[0]
+                                nod['stock_code'] = row[1]
+                                rel = Relationship(nod, 'COM_Output_COM', node)
+                                rel['report_dt'] = row[2]
+                                rel['output_funt'] = row[3]
+                                graph.create(nod | rel)
                         else:
                             nod = Node('COMPANY')
                             nod['com_name'] = row[0]
-                            nod['stock_code'] = row[1]
+                            graph.create(nod)
                             rel = Relationship(nod, 'COM_Output_COM', node)
                             rel['report_dt'] = row[2]
                             rel['output_funt'] = row[3]
-                            graph.create(nod | rel)
-                    else:
-                        nod = Node('COMPANY')
-                        nod['com_name'] = row[0]
-                        graph.create(nod)
-                        rel = Relationship(nod, 'COM_Output_COM', node)
-                        rel['report_dt'] = row[2]
-                        rel['output_funt'] = row[3]
-                        graph.create(rel)
-        if '下游' in file:  # 下游公司
-            csvpath = file_path + file
-            with open(csvpath, 'r', encoding='utf8', newline='') as csvfile:
-                rows = csv.reader(csvfile, delimiter=';')
-                k = -1
-                for row in rows:
-                    k += 1
-                    if k == 0:
-                        continue
-                    rel_num += 1
-                    print(rel_num, stock_code, '-->', row)
-                    row[3] = float(row[3].replace(',', ''))
-                    if row[1] != '-':
-                        down_code = row[1]
-                        node_down = graph.find_one(label='COMPANY', property_key='stock_code', property_value=down_code)
-                        if node_down:
-                            rel = Relationship(node, 'COM_Output_COM', node_down)
-                            rel['report_dt'] = row[2]
-                            rel['output_funt'] = row[3]
                             graph.create(rel)
+            if '下游' in file:  # 下游公司
+                csvpath = file_path + file
+                with open(csvpath, 'r', encoding='utf8', newline='') as csvfile:
+                    rows = csv.reader(csvfile, delimiter=';')
+                    k = -1
+                    for row in rows:
+                        k += 1
+                        if k == 0:
+                            continue
+                        rel_num += 1
+                        print(rel_num, stock_code, '-->', row)
+                        row[3] = float(row[3].replace(',', ''))
+                        if row[1] != '-':
+                            down_code = row[1]
+                            node_down = graph.find_one(label='COMPANY', property_key='stock_code', property_value=down_code)
+                            if node_down:
+                                rel = Relationship(node, 'COM_Output_COM', node_down)
+                                rel['report_dt'] = row[2]
+                                rel['output_funt'] = row[3]
+                                graph.create(rel)
+                            else:
+                                nod = Node('COMPANY')
+                                nod['com_name'] = row[0]
+                                nod['stock_code'] = row[1]
+                                rel = Relationship(node, 'COM_Output_COM', nod)
+                                rel['report_dt'] = row[2]
+                                rel['output_funt'] = row[3]
+                                graph.create(nod | rel)
                         else:
                             nod = Node('COMPANY')
                             nod['com_name'] = row[0]
-                            nod['stock_code'] = row[1]
+                            graph.create(nod)
                             rel = Relationship(node, 'COM_Output_COM', nod)
                             rel['report_dt'] = row[2]
                             rel['output_funt'] = row[3]
-                            graph.create(nod | rel)
-                    else:
-                        nod = Node('COMPANY')
-                        nod['com_name'] = row[0]
-                        graph.create(nod)
-                        rel = Relationship(node, 'COM_Output_COM', nod)
-                        rel['report_dt'] = row[2]
-                        rel['output_funt'] = row[3]
-                        graph.create(rel)
+                            graph.create(rel)
 
 
-def Create_Industry():  # 在图中创建行业节点，以及公司与行业的关系
+def create_industry():  # 在图中创建行业节点，以及公司与行业的关系
     with open('../Data/industry_tag.csv', 'r', encoding='utf-8', newline='') as csvfile:
         rows = csv.reader(csvfile)
         k = -1
@@ -140,7 +141,7 @@ def Create_Industry():  # 在图中创建行业节点，以及公司与行业的
                 graph.create(com_rel)
 
 
-def Create_Com_Invest():  # 在图中创建公司投资关系，如果公司节点不存在则创建
+def create_com_invest():  # 在图中创建公司投资关系，如果公司节点不存在则创建
     file_path = '../Data/A股上市公司投资情况/'
     files = file_name(file_path)
     rel_num = 0
@@ -186,5 +187,10 @@ def Create_Com_Invest():  # 在图中创建公司投资关系，如果公司节�
                         rel['proportion'] = row[3]
                         graph.create(rel)
 
-if __name__ == '__main__':
 
+# def create_com_block():
+
+
+
+if __name__ == '__main__':
+    create_company()
