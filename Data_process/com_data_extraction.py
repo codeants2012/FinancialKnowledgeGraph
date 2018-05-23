@@ -89,7 +89,7 @@ def com_UAD_extraction():  # 将Excel文件中的公司上下游数据抽取到c
                         csvwriter.writerow(cell_list)
 
 
-def com_Holding_extraction():  # 将Excel文件中的公司投资数据抽取到csv文件中
+def com_Invest_extraction():  # 将Excel文件中的公司投资数据抽取到csv文件中
     file_path = '../Data/A股上市公司关系网/'
     files = file_name(file_path)
     count = 0
@@ -193,4 +193,6 @@ def com_Block_extraction():  # 将Excel文件中的所有板块数据抽取到cs
 
 
 if __name__ == '__main__':
-
+    com_UAD_extraction()
+    com_Invest_extraction()
+    com_Block_extraction()

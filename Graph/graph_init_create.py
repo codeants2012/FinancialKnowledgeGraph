@@ -28,8 +28,6 @@ def Create_CompanyAndAStock():  # 在图中创建A股上市公司节点
             node['acc_firm'] = row[9]
             node['sec_aff_rep'] = row[10]
             node['adv_ser'] = row[11]
-            node['block_name'] = row[12]
-            node['indu_name'] = row[13]
             graph.create(node)
             print(count, row)
 
