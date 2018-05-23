@@ -4,7 +4,7 @@ import csv
 from Data_process.com_data_extraction import file_name
 
 
-# graph = Con_Neo4j(http='http://0.0.0.0:7474', username='neo4j', password='Neo4j')
+graph = Con_Neo4j(http='http://0.0.0.0:7474', username='neo4j', password='Neo4j')
 
 
 def Create_CompanyAndAStock():  # 在图中创建A股上市公司节点
@@ -189,37 +189,4 @@ def Create_Com_Invest():  # 在图中创建公司投资关系，如果公司节�
                         graph.create(rel)
 
 if __name__ == '__main__':
-    file_path = '../Data/板块/'
-    files = file_name(file_path)
-    count = 0
-    codes = []
-    for file in files:  # 遍历文件夹中的所有的文件
-        if '.csv' not in file:
-            continue
-        csvpath = file_path + file
-        with open(csvpath, 'r', encoding='utf8', newline='') as csvfile:
-            rows = csv.reader(csvfile, delimiter=';')
-            k = -1
-            for row in rows:
-                k += 1
-                if k == 0:
-                    continue
-                if row[1][0] not in ['0', '3', '6'] or row[1][-2:] not in ['SH', 'SZ']:
-                    print(file, row)
-                    continue
-                elif row[1] not in codes:
-                    codes.append(row[1])
-                    count += 1
-    print(count)
-    with open('../Data/company.csv', 'r', encoding='utf8', newline='') as csvfile:
-        rows = csv.reader(csvfile, delimiter=';')
-        k = -1
-        com_codes = []
-        for row in rows:
-            k += 1
-            if k == 0:
-                continue
-            com_codes.append(row[0])
-    for code in codes:
-        if code not in com_codes:
-            print(code)
+

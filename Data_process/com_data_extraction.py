@@ -12,7 +12,7 @@ def file_name(file_dir):  # 获取文件夹信息
         return files  # 返回文件列表
 
 
-def find_missing(files, xlspath):  # 查找遗漏的文件项
+def find_missing_files(files, xlspath):  # 查找遗漏的文件项
     workbook = open_workbook(xlspath)
     booksheet = workbook.sheet_by_index(0)
     rows = booksheet.nrows
@@ -27,6 +27,7 @@ def find_missing(files, xlspath):  # 查找遗漏的文件项
                 continue
         if key == 0:
             print(code)
+
 
 
 def com_UAD_extraction():  # 将Excel文件中的公司上下游数据抽取到csv文件中
@@ -192,4 +193,4 @@ def com_Block_extraction():  # 将Excel文件中的所有板块数据抽取到cs
 
 
 if __name__ == '__main__':
-    com_Block_extraction()
+
