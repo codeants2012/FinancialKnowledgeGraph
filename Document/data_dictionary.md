@@ -1,5 +1,5 @@
 ## 节点
-### COMPANY
+- COMPANY  
 股票代码:stock_code  
 公司简称:chi_sht  
 公司全称:com_name  
@@ -14,15 +14,16 @@
 咨询服务机构:adv_ser  
 所属板块:block_name  
 所属行业:indu_name  
-### STOCK
-股票代码:stock_code  
-股票名称:stock_name  
-### INDUSTRY
+- INDUSTRY  
 行业名称:ind_name  
 ~~行业代码:ind_code~~  
 
 
 ## 关系
-### COM_Output_COM
+- COM_BelongTo_I  
+- COM_Output_COM  
 报告期:report_dt  
 金额(万元):output_funt  
+- COM_Invest_COM  
+报告期:report_dt  
+持股比例:proportion  

@@ -30,7 +30,7 @@ def Con_MySQL(database=None, user=None, password=None, host=None, port=3306, cha
     return connMy
 
 
-def period_cmp(start_time1=None, end_time1=None, start_time2=None, end_time2=None):
+def Period_Cmp(start_time1=None, end_time1=None, start_time2=None, end_time2=None):
     """
     函数功能：匹配时间段重叠情况。
     时间格式统一为‘1995-4-16’。
@@ -57,7 +57,7 @@ def period_cmp(start_time1=None, end_time1=None, start_time2=None, end_time2=Non
         return None  # 若不存在时间重叠，则返回空
 
 
-def time_now(type_int=0):
+def Time_Now(type_int=0):
     """
     函数功能：将当前时间调整为特定格式。
     时间格式统一为‘1995-4-16’。
