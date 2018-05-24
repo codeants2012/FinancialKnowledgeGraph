@@ -14,7 +14,10 @@
 咨询服务机构:adv_ser  
 - INDUSTRY  
 行业名称:ind_name  
+分类体系:class_system
 ~~行业代码:ind_code~~  
+- BLOCK
+板块名称:block_name
 
 
 ## 关系
