@@ -32,7 +32,7 @@ if __name__ == '__main__':
             value = tds[1].get_text().replace('\n', '').replace('\t', '').replace('\r', '')
             mess[key] = value
         # print(mess)
-        with open('../../Data/add_company.csv', 'a', encoding='utf8', newline='') as fout:
+        with open('../../Data/add_company.csv', 'a', encoding='utf-8', newline='') as fout:
             csvwriter = csv.writer(fout, delimiter=';')
             list = []
             try:

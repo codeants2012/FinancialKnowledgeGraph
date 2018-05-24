@@ -2,8 +2,8 @@ import csv
 
 
 def com_data_pre1():  # 爬取的公司数据-预处理1：调整字段顺序、删除多余字符
-    with open('../Crawler_Script/data/company.csv', 'r', encoding='utf8') as read, \
-            open('../Data/company.csv', 'w', encoding='utf8', newline='') as write:
+    with open('../Crawler_Script/data/company.csv', 'r', encoding='utf-8') as read, \
+            open('../Data/company.csv', 'w', encoding='utf-8', newline='') as write:
         head = ['股票代码', '公司简称', '公司全称', '公司英文名称', '成立日期', '所属地域', '曾用名', '法定代表人', '独立董事',
                 '会计师事务所', '证券事务代表', '咨询服务机构', '所属概念', '所属行业']
         rows = csv.reader(read)
@@ -29,8 +29,8 @@ def com_data_pre1():  # 爬取的公司数据-预处理1：调整字段顺序、
 
 
 def com_data_pre2():  # 爬取的公司数据-预处理2：解决部分数据字段分隔错误问题、删除多余空格、补全股票代码
-    with open('../Data/com_temp.csv', 'r', encoding='utf8', newline='') as csvfile, \
-            open('../Data/company.csv', 'w', encoding='utf8', newline='') as csv2:
+    with open('../Data/com_temp.csv', 'r', encoding='utf-8', newline='') as csvfile, \
+            open('../Data/company.csv', 'w', encoding='utf-8', newline='') as csv2:
         rows = csv.reader(csvfile, delimiter=';')
         csvwriter = csv.writer(csv2, delimiter=';')
         count = 0
@@ -53,9 +53,9 @@ def com_data_pre2():  # 爬取的公司数据-预处理2：解决部分数据字
 
 
 def com_data_pre3():  # 整合并排序多个文件中的公司数据
-    with open('../Data/company.csv', 'r', encoding='utf8', newline='') as csv1, \
-            open('../Data/add_company.csv', 'r', encoding='utf8', newline='') as csv2, \
-            open('../Data/company1.csv', 'w', encoding='utf8', newline='') as csv3:
+    with open('../Data/company.csv', 'r', encoding='utf-8', newline='') as csv1, \
+            open('../Data/add_company.csv', 'r', encoding='utf-8', newline='') as csv2, \
+            open('../Data/company1.csv', 'w', encoding='utf-8', newline='') as csv3:
         rows1 = csv.reader(csv1, delimiter=';')
         rows2 = csv.reader(csv2, delimiter=';')
         csvwriter = csv.writer(csv3, delimiter=';')
@@ -69,7 +69,7 @@ def com_data_pre3():  # 整合并排序多个文件中的公司数据
             data.append(row)
         for row in rows2:
             if '.' not in row[0]:
-                row[0] = row[0] + ('.SH' if row[0][0] == '6' else ',SZ')
+                row[0] = row[0] + ('.SH' if row[0][0] == '6' else '.ßSZ')
             data.append(row)
         csvwriter.writerow(head)
         for row in sorted(data):

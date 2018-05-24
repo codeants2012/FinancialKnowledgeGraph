@@ -51,7 +51,7 @@ def com_output_extraction():  # 将Excel文件中的公司上下游数据抽取�
                 for i in range(4):
                     head.append(str(booksheet.cell_value(4, i)))
                 path = csvpath + name + '.csv'
-                with open(file=path, mode='w', encoding='utf8', newline='') as csvfile:
+                with open(file=path, mode='w', encoding='utf-8', newline='') as csvfile:
                     csvwriter = csv.writer(csvfile, delimiter=';')
                     csvwriter.writerow(head)
                     for row in range(5, rows):
@@ -74,7 +74,7 @@ def com_output_extraction():  # 将Excel文件中的公司上下游数据抽取�
                 for i in range(4):
                     head.append(str(booksheet.cell_value(4, i)))
                 path = csvpath + name + '.csv'
-                with open(file=path, mode='w', encoding='utf8', newline='') as csvfile:
+                with open(file=path, mode='w', encoding='utf-8', newline='') as csvfile:
                     csvwriter = csv.writer(csvfile, delimiter=';')
                     csvwriter.writerow(head)
                     for row in range(5, rows):
@@ -110,7 +110,7 @@ def com_invest_extraction():  # 将Excel文件中的公司投资数据抽取到c
                 for i in range(4):
                     head.append(str(booksheet.cell_value(4, i)))
                 path = csvpath + name + '.csv'
-                with open(file=path, mode='w', encoding='utf8', newline='') as csvfile:
+                with open(file=path, mode='w', encoding='utf-8', newline='') as csvfile:
                     csvwriter = csv.writer(csvfile, delimiter=';')
                     csvwriter.writerow(head)
                     for row in range(5, rows):
@@ -150,7 +150,7 @@ def com_block_extraction():  # 将Excel文件中的所有板块数据抽取到cs
                         if block_com not in blocks:
                             blocks.append(block_com)
                             path = csvpath + block_com + '.csv'
-                            with open(file=path, mode='w', encoding='utf8', newline='') as csvfile:
+                            with open(file=path, mode='w', encoding='utf-8', newline='') as csvfile:
                                 csvwriter = csv.writer(csvfile, delimiter=';')
                                 csvwriter.writerow(head)
                                 k = -1
@@ -163,7 +163,8 @@ def com_block_extraction():  # 将Excel文件中的所有板块数据抽取到cs
                         continue
                     elif booksheet.cell_value(row, 1) == '':
                         block_com = booksheet.cell_value(row, 0).replace('/', '_')
-                        com_blocks.append(block_com)
+                        if block_com not in com_blocks:
+                            com_blocks.append(block_com)
                     else:
                         cell_list = []
                         for i in range(3):
@@ -172,7 +173,7 @@ def com_block_extraction():  # 将Excel文件中的所有板块数据抽取到cs
                 if block_com not in blocks:
                     blocks.append(block_com)
                     path = csvpath + block_com + '.csv'
-                    with open(file=path, mode='w', encoding='utf8', newline='') as csvfile:
+                    with open(file=path, mode='w', encoding='utf-8', newline='') as csvfile:
                         csvwriter = csv.writer(csvfile, delimiter=';')
                         csvwriter.writerow(head)
                         k = -1
@@ -182,7 +183,7 @@ def com_block_extraction():  # 将Excel文件中的所有板块数据抽取到cs
                                 continue
                             csvwriter.writerow(data)
                 path = '../Data/A股上市公司所属板块/' + name + '.csv'
-                with open(file=path, mode='w', encoding='utf8', newline='') as csvfile:
+                with open(file=path, mode='w', encoding='utf-8', newline='') as csvfile:
                     csvwriter = csv.writer(csvfile, delimiter=';')
                     csvwriter.writerow(['板块名称'])
                     for b in com_blocks:

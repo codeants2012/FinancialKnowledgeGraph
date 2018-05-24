@@ -7,6 +7,27 @@ from Data_process.com_data_extraction import file_name
 graph = Con_Neo4j(http='http://127.0.0.1:7474', username='neo4j', password='123456')
 
 
+def com_type(code):  # 识别公司代码所属类别，包括：深A、沪A、深B、沪B、三板、其它、非上市
+    if len(code) >= 6:
+        if code[0] in ['0', '3']:
+            c_type = '深A'
+        elif code[0] in ['6']:
+            c_type = '沪A'
+        elif code[0] in ['2']:
+            c_type = '深B'
+        elif code[0] in ['9']:
+            c_type = '沪B'
+        elif code[0] in ['4', '8']:
+            c_type = '三板'
+        else:
+            c_type = '其它'
+    elif code in ['', '-', '--']:
+        c_type = '非上市'
+    else:
+        c_type = '其它'
+    return c_type
+
+
 def create_company():  # 在图中创建A股上市公司节点
     with open('../Data/company.csv', 'r', encoding='utf-8', newline='') as csvfile:
         rows = csv.reader(csvfile, delimiter=';')
@@ -132,10 +153,15 @@ def create_com_output():  # 在图中创建公司产业输出关系（上下游�
                                 rel['output_funt'] = row[3]
                                 graph.create(nod | rel)
                         else:
-                            nod = Node('COMPANY')
-                            nod['com_name'] = row[0]
-                            graph.create(nod)
-                            rel = Relationship(nod, 'COM_Output_COM', node)
+                            node_up = graph.find_one(label='COMPANY', property_key='com_name', property_value=row[0])
+                            if node_up:
+                                rel = Relationship(node_up, 'COM_Output_COM', node)
+                            else:
+                                nod = Node('COMPANY')
+                                nod['com_name'] = row[0]
+                                nod['com_type'] = com_type(row[1])
+                                graph.create(nod)
+                                rel = Relationship(nod, 'COM_Output_COM', node)
                             rel['report_dt'] = row[2]
                             rel['output_funt'] = row[3]
                             graph.create(rel)
@@ -170,10 +196,15 @@ def create_com_output():  # 在图中创建公司产业输出关系（上下游�
                                 rel['output_funt'] = row[3]
                                 graph.create(nod | rel)
                         else:
-                            nod = Node('COMPANY')
-                            nod['com_name'] = row[0]
-                            graph.create(nod)
-                            rel = Relationship(node, 'COM_Output_COM', nod)
+                            node_down = graph.find_one(label='COMPANY', property_key='com_name', property_value=row[0])
+                            if node_down:
+                                rel = Relationship(node, 'COM_Output_COM', node_down)
+                            else:
+                                nod = Node('COMPANY')
+                                nod['com_name'] = row[0]
+                                nod['com_type'] = com_type(row[1])
+                                graph.create(nod)
+                                rel = Relationship(node, 'COM_Output_COM', nod)
                             rel['report_dt'] = row[2]
                             rel['output_funt'] = row[3]
                             graph.create(rel)
@@ -219,10 +250,15 @@ def create_com_invest():  # 在图中创建公司投资关系，如果公司节�
                             rel['proportion'] = row[3]
                             graph.create(nod | rel)
                     else:
-                        nod = Node('COMPANY')
-                        nod['com_name'] = row[0]
-                        graph.create(nod)
-                        rel = Relationship(node, 'COM_Invest_COM', nod)
+                        node_holded = graph.find_one(label='COMPANY', property_key='com_name', property_value=row[0])
+                        if node_holded:
+                            rel = Relationship(node, 'COM_Invest_COM', node_holded)
+                        else:
+                            nod = Node('COMPANY')
+                            nod['com_name'] = row[0]
+                            nod['com_type'] = com_type(row[1])
+                            graph.create(nod)
+                            rel = Relationship(node, 'COM_Invest_COM', nod)
                         rel['report_dt'] = row[2]
                         rel['proportion'] = row[3]
                         graph.create(rel)
