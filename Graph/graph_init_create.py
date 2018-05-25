@@ -2,6 +2,7 @@ from Graph.process import Con_Neo4j
 from py2neo import Relationship, Node
 import csv
 from Data_process.com_data_extraction import file_name
+import re
 
 
 graph = Con_Neo4j(http='http://127.0.0.1:7474', username='neo4j', password='123456')
@@ -54,8 +55,21 @@ def create_company():  # 在图中创建A股上市公司节点
             print(count, row)
 
 
-def create_industry():  # 在图中创建行业节点，以及公司与行业的关系
-    with open('../Data/industry_tags.csv', 'r', encoding='utf-8', newline='') as csvfile:
+def create_industry():  # 在图中的创建行业节点
+    with open('../Data/industry_tags_id.txt', mode='r', encoding='utf-8', newline='') as txtfile:
+        rows = txtfile.readlines()
+        for row in rows:
+            inds = row.replace('\n', '').split('\t')
+            node = Node('INDUSTRY')
+            node['ind_code'] = inds[0]
+            node['ind_name'] = inds[1]
+            node['class_system'] = '申万三级'
+            graph.create(node)
+            print(inds)
+
+
+def create_com_to_ind():  # 在图中创建公司与行业的关系
+    with open('../Data/com_industry_tags.csv', 'r', encoding='utf-8', newline='') as csvfile:
         rows = csv.reader(csvfile)
         k = -1
         for row in rows:
@@ -76,7 +90,7 @@ def create_industry():  # 在图中创建行业节点，以及公司与行业的
                 new_node['class_system'] = '申万三级'
                 com_rel = Relationship(com_node, 'COM_BelongTo_I', new_node)
                 graph.create(new_node | com_rel)
-            print(k, row)
+                print(k, row)
 
 
 def create_com_block():  # 在图中创建板块节点，以及A股上市公司与板块的关系
@@ -264,5 +278,22 @@ def create_com_invest():  # 在图中创建公司投资关系，如果公司节�
                         graph.create(rel)
 
 
+def create_user_to_industry():  # 在图中创建用户节点，以及用户与行业的关系
+    with open('../Data/user_labels.txt', mode='r', encoding='utf-8', newline='') as txtfile:
+        rows = txtfile.readlines()
+        for row in rows:
+            pattern = re.compile(r'\d+')
+            res = re.findall(pattern, row)
+            print(res)
+            user_node = Node('USER')
+            user_node['user_id'] = res[0]
+            graph.create(user_node)
+            codes = res[1:]
+            for code in codes:
+                ind_node = graph.find_one(label='INDUSTRY', property_key='ind_code', property_value=code)
+                rel = Relationship(user_node, 'U_FocusOn_I', ind_node)
+                graph.create(rel)
+
+
 if __name__ == '__main__':
-    create_com_block()
+    create_industry()

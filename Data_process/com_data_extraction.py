@@ -1,5 +1,6 @@
 import csv
 import os
+import re
 
 from xlrd import open_workbook
 
@@ -193,4 +194,4 @@ def com_block_extraction():  # 将Excel文件中的所有板块数据抽取到cs
 
 
 if __name__ == '__main__':
-    com_output_extraction()
+    print('Six')
