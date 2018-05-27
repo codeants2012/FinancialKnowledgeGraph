@@ -296,4 +296,4 @@ def create_user_to_industry():  # 在图中创建用户节点，以及用户与�
 
 
 if __name__ == '__main__':
-    create_industry()
+    create_user_to_industry()

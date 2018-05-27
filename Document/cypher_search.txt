@@ -1,0 +1,5 @@
+查找两个节点之间的所有最短路径（可定制：关系类型[|]、最大路径长度[*..n]）
+match (n:COMPANY {chi_sht:"中国联通"}),(m:COMPANY {chi_sht:"广发证券"}),p=allshortestPaths((n)-[:COM_Output_COM|COM_BelongTo_B|COM_BelongTo_I|COM_Invest_COM *..10]-(m)) return p;
+
+查找两个节点之间的所有最短带权路径（可定制：关系筛选[+-<>]、关系类型[|()]、默认权值属性、默认权值）
+match (n:COMPANY {chi_sht:"中国联通"}),(m:COMPANY {chi_sht:"广发证券"}) call apoc.algo.dijkstraWithDefaultWeight(n, m, 'COM_BelongTo_B|(<COM_BelongTo_I|+COM_Output_COM|-COM_Invest_COM)', 'cost', 1) YIELD path, weight return path, weight;
