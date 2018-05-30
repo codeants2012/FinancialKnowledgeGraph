@@ -23,11 +23,11 @@
 
 
 ## 关系
-- COM_BelongTo_I
+- COM_BelongTo_IND
 - COM_Output_COM  
 报告期:report_dt  
 金额(万元):output_funt
 - COM_Invest_COM  
 报告期:report_dt  
 持股比例:proportion
-- U-FocusOn_I
+- U-FocusOn_IND

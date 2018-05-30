@@ -3,6 +3,7 @@ from py2neo import Relationship, Node
 import csv
 from Data_process.com_data_extraction import file_name
 import re
+import time
 
 
 graph = Con_Neo4j(http='http://127.0.0.1:7474', username='neo4j', password='123456')
@@ -30,6 +31,7 @@ def com_type(code):  # 识别公司代码所属类别，包括：深A、沪A、�
 
 
 def create_company():  # 在图中创建A股上市公司节点
+    time1 = time.time()
     with open('../Data/company.csv', 'r', encoding='utf-8', newline='') as csvfile:
         rows = csv.reader(csvfile, delimiter=';')
         count = -1
@@ -52,10 +54,13 @@ def create_company():  # 在图中创建A股上市公司节点
             node['adv_ser'] = row[11]
             node['com_type'] = com_type(row[0])
             graph.create(node)
-            print(count, row)
+            # print(count, row)
+    time2 = time.time()
+    print('Over: create_company', time2 - time1)
 
 
 def create_industry():  # 在图中的创建行业节点
+    time1 = time.time()
     with open('../Data/industry_tags_id.txt', mode='r', encoding='utf-8', newline='') as txtfile:
         rows = txtfile.readlines()
         for row in rows:
@@ -65,10 +70,13 @@ def create_industry():  # 在图中的创建行业节点
             node['ind_name'] = inds[1]
             node['class_system'] = '申万三级'
             graph.create(node)
-            print(inds)
+            # print(inds)
+    time2 = time.time()
+    print('Over: create_industry', time2 - time1)
 
 
 def create_com_to_ind():  # 在图中创建公司与行业的关系
+    time1 = time.time()
     with open('../Data/com_industry_tags.csv', 'r', encoding='utf-8', newline='') as csvfile:
         rows = csv.reader(csvfile)
         k = -1
@@ -79,21 +87,23 @@ def create_com_to_ind():  # 在图中创建公司与行业的关系
             com_node = graph.find_one(label='COMPANY', property_key='stock_code', property_value=row[0])
             ind_node = graph.find_one(label='INDUSTRY', property_key='ind_name', property_value=row[2])
             if not com_node:
-                # print(k, row)
                 continue
             if ind_node:
-                com_rel = Relationship(com_node, 'COM_BelongTo_I', ind_node)
+                com_rel = Relationship(com_node, 'COM_BelongTo_IND', ind_node)
                 graph.create(com_rel)
             else:
+                print('Missing industry:', k, row)
                 new_node = Node('INDUSTRY')
                 new_node['ind_name'] = row[2]
                 new_node['class_system'] = '申万三级'
-                com_rel = Relationship(com_node, 'COM_BelongTo_I', new_node)
+                com_rel = Relationship(com_node, 'COM_BelongTo_IND', new_node)
                 graph.create(new_node | com_rel)
-                print(k, row)
+    time2 = time.time()
+    print('Over: create_com_to_ind', time2 - time1)
 
 
 def create_com_block():  # 在图中创建板块节点，以及A股上市公司与板块的关系
+    time1 = time.time()
     file_path = '../Data/A股上市公司所属板块/'
     files = file_name(file_path)
     rel_num = 0
@@ -112,7 +122,7 @@ def create_com_block():  # 在图中创建板块节点，以及A股上市公司�
                     if k == 0:
                         continue
                     rel_num += 1
-                    print(rel_num, stock_code, '-->', row)
+                    # print(rel_num, stock_code, '-->', row)
                     block_node = graph.find_one(label='BLOCK', property_key='block_name', property_value=row[0])
                     if block_node:
                         rel = Relationship(node, 'COM_BelongTo_B', block_node)
@@ -122,9 +132,12 @@ def create_com_block():  # 在图中创建板块节点，以及A股上市公司�
                         nod['block_name'] = row[0]
                         rel = Relationship(node, 'COM_BelongTo_B', nod)
                         graph.create(nod | rel)
+    time2 = time.time()
+    print('Over: create_com_block', time2 - time1)
 
 
 def create_com_output():  # 在图中创建公司产业输出关系（上下游），如果公司节点不存在则创建
+    time1 = time.time()
     file_path = '../Data/A股上市公司上下游/'
     files = file_name(file_path)
     rel_num = 0
@@ -146,7 +159,7 @@ def create_com_output():  # 在图中创建公司产业输出关系（上下游�
                         if k == 0:
                             continue
                         rel_num += 1
-                        print(rel_num, row, '-->', stock_code)
+                        # print(rel_num, row, '-->', stock_code)
                         if row[3] not in ['', '-', '--']:
                             row[3] = float(row[3].replace(',', ''))
                         if row[1] != '-':
@@ -189,7 +202,7 @@ def create_com_output():  # 在图中创建公司产业输出关系（上下游�
                         if k == 0:
                             continue
                         rel_num += 1
-                        print(rel_num, stock_code, '-->', row)
+                        # print(rel_num, stock_code, '-->', row)
                         if row[3] not in ['', '-', '--']:
                             row[3] = float(row[3].replace(',', ''))
                         if row[1] != '-':
@@ -222,9 +235,12 @@ def create_com_output():  # 在图中创建公司产业输出关系（上下游�
                             rel['report_dt'] = row[2]
                             rel['output_funt'] = row[3]
                             graph.create(rel)
+    time2 = time.time()
+    print('Over: create_com_output', time2 - time1)
 
 
 def create_com_invest():  # 在图中创建公司投资关系，如果公司节点不存在则创建
+    time1 = time.time()
     file_path = '../Data/A股上市公司投资情况/'
     files = file_name(file_path)
     rel_num = 0
@@ -243,7 +259,7 @@ def create_com_invest():  # 在图中创建公司投资关系，如果公司节�
                     if k == 0:
                         continue
                     rel_num += 1
-                    print(rel_num, stock_code, '-->', row)
+                    # print(rel_num, stock_code, '-->', row)
                     if row[3] not in ['', '-', '--']:
                         row[3] = float(row[3].replace(',', ''))
                     if row[1] != '-':
@@ -276,24 +292,35 @@ def create_com_invest():  # 在图中创建公司投资关系，如果公司节�
                         rel['report_dt'] = row[2]
                         rel['proportion'] = row[3]
                         graph.create(rel)
+    time2 = time.time()
+    print('Over: create_com_invest', time2 - time1)
 
 
 def create_user_to_industry():  # 在图中创建用户节点，以及用户与行业的关系
+    time1 = time.time()
     with open('../Data/user_labels.txt', mode='r', encoding='utf-8', newline='') as txtfile:
         rows = txtfile.readlines()
         for row in rows:
             pattern = re.compile(r'\d+')
             res = re.findall(pattern, row)
-            print(res)
+            # print(res)
             user_node = Node('USER')
             user_node['user_id'] = res[0]
             graph.create(user_node)
             codes = res[1:]
             for code in codes:
                 ind_node = graph.find_one(label='INDUSTRY', property_key='ind_code', property_value=code)
-                rel = Relationship(user_node, 'U_FocusOn_I', ind_node)
+                rel = Relationship(user_node, 'U_FocusOn_IND', ind_node)
                 graph.create(rel)
+    time2 = time.time()
+    print('Over: create_user_to_industry', time2 - time1)
 
 
 if __name__ == '__main__':
+    create_company()
+    create_industry()
+    create_com_to_ind()
+    create_com_block()
+    create_com_output()
+    create_com_invest()
     create_user_to_industry()
