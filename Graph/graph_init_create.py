@@ -104,7 +104,7 @@ def create_com_to_ind():  # 在图中创建公司与行业的关系
 
 def create_com_block():  # 在图中创建板块节点，以及A股上市公司与板块的关系
     time1 = time.time()
-    file_path = '../Data/A股上市公司所属板块/'
+    file_path = '../Data/AStack_com_block/'
     files = file_name(file_path)
     rel_num = 0
     for file in files:  # 遍历文件夹中的所有的文件
@@ -138,7 +138,7 @@ def create_com_block():  # 在图中创建板块节点，以及A股上市公司�
 
 def create_com_output():  # 在图中创建公司产业输出关系（上下游），如果公司节点不存在则创建
     time1 = time.time()
-    file_path = '../Data/A股上市公司上下游/'
+    file_path = '../Data/AStack_com_output/'
     files = file_name(file_path)
     rel_num = 0
     for file in files:  # 遍历文件夹中的所有的文件
@@ -241,7 +241,7 @@ def create_com_output():  # 在图中创建公司产业输出关系（上下游�
 
 def create_com_invest():  # 在图中创建公司投资关系，如果公司节点不存在则创建
     time1 = time.time()
-    file_path = '../Data/A股上市公司投资情况/'
+    file_path = '../Data/AStack_com_invest/'
     files = file_name(file_path)
     rel_num = 0
     for file in files:  # 遍历文件夹中的所有的文件
@@ -298,7 +298,7 @@ def create_com_invest():  # 在图中创建公司投资关系，如果公司节�
 
 def create_user_to_industry():  # 在图中创建用户节点，以及用户与行业的关系
     time1 = time.time()
-    with open('../Data/user_labels.txt', mode='r', encoding='utf-8', newline='') as txtfile:
+    with open('../Data/User/user_labels_ind.txt', mode='r', encoding='utf-8', newline='') as txtfile:
         rows = txtfile.readlines()
         for row in rows:
             pattern = re.compile(r'\d+')

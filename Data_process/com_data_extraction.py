@@ -1,6 +1,5 @@
 import csv
 import os
-import re
 
 from xlrd import open_workbook
 
@@ -31,14 +30,14 @@ def find_missing_files(files, xlspath):  # 查找遗漏的文件项
 
 
 def com_output_extraction():  # 将Excel文件中的公司上下游数据抽取到csv文件中
-    file_path = '../Data/A股上市公司关系网/'
+    file_path = '../Data/AStack_com_network/'
     files = file_name(file_path)
     count = 0
     for file in files:
         if '.xlsx' not in file or file[0] == '~':
             continue
         fpath = file_path + file
-        csvpath = '../Data/A股上市公司上下游/'
+        csvpath = '../Data/AStack_com_output/'
         workbook = open_workbook(fpath)
         if '上游' in workbook.sheet_names():
             booksheet = workbook.sheet_by_name('上游')
@@ -90,14 +89,14 @@ def com_output_extraction():  # 将Excel文件中的公司上下游数据抽取�
 
 
 def com_invest_extraction():  # 将Excel文件中的公司投资数据抽取到csv文件中
-    file_path = '../Data/A股上市公司关系网/'
+    file_path = '../Data/AStack_com_network/'
     files = file_name(file_path)
     count = 0
     for file in files:
         if '.xlsx' not in file or file[0] == '~':
             continue
         fpath = file_path + file
-        csvpath = '../Data/A股上市公司投资情况/'
+        csvpath = '../Data/AStack_com_invest/'
         workbook = open_workbook(fpath)
         if '投资' in workbook.sheet_names():
             booksheet = workbook.sheet_by_name('投资')
@@ -126,7 +125,7 @@ def com_invest_extraction():  # 将Excel文件中的公司投资数据抽取到c
 
 
 def com_block_extraction():  # 将Excel文件中的所有板块数据抽取到csv文件中
-    file_path = '../Data/A股上市公司关系网/'
+    file_path = '../Data/AStack_com_network/'
     files = file_name(file_path)
     blocks = []
     head = ['公司名称', '股票代码', '营业总收入(万元)']
@@ -135,7 +134,7 @@ def com_block_extraction():  # 将Excel文件中的所有板块数据抽取到cs
         if '.xlsx' not in file or file[0] == '~':
             continue
         fpath = file_path + file
-        csvpath = '../Data/板块/'
+        csvpath = '../Data/Block/'
         workbook = open_workbook(fpath)
         if '概念' in workbook.sheet_names():
             booksheet = workbook.sheet_by_name('概念')
@@ -183,7 +182,7 @@ def com_block_extraction():  # 将Excel文件中的所有板块数据抽取到cs
                             if k == 0:
                                 continue
                             csvwriter.writerow(data)
-                path = '../Data/A股上市公司所属板块/' + name + '.csv'
+                path = '../Data/AStack_com_block/' + name + '.csv'
                 with open(file=path, mode='w', encoding='utf-8', newline='') as csvfile:
                     csvwriter = csv.writer(csvfile, delimiter=';')
                     csvwriter.writerow(['板块名称'])
