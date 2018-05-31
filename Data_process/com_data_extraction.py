@@ -153,10 +153,8 @@ def com_block_extraction():  # 将Excel文件中的所有板块数据抽取到cs
                             with open(file=path, mode='w', encoding='utf-8', newline='') as csvfile:
                                 csvwriter = csv.writer(csvfile, delimiter=';')
                                 csvwriter.writerow(head)
-                                k = -1
-                                for data in datas:
-                                    k += 1
-                                    if k == 0:
+                                for index, data in enumerate(datas):
+                                    if index == 0:
                                         continue
                                     csvwriter.writerow(data)
                         datas = []
@@ -176,10 +174,8 @@ def com_block_extraction():  # 将Excel文件中的所有板块数据抽取到cs
                     with open(file=path, mode='w', encoding='utf-8', newline='') as csvfile:
                         csvwriter = csv.writer(csvfile, delimiter=';')
                         csvwriter.writerow(head)
-                        k = -1
-                        for data in datas:
-                            k += 1
-                            if k == 0:
+                        for index, data in enumerate(datas):
+                            if index == 0:
                                 continue
                             csvwriter.writerow(data)
                 path = '../Data/AStack_com_block/' + name + '.csv'

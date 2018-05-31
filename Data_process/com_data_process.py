@@ -60,10 +60,8 @@ def com_data_pre3():  # 整合并排序多个文件中的公司数据
         rows2 = csv.reader(csv2, delimiter=';')
         csvwriter = csv.writer(csv3, delimiter=';')
         data = []
-        k = -1
-        for row in rows1:
-            k += 1
-            if k == 0:
+        for index, row in enumerate(rows1):
+            if index == 0:
                 head = row
                 continue
             data.append(row)

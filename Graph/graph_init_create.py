@@ -34,10 +34,8 @@ def create_company():  # 在图中创建A股上市公司节点
     time1 = time.time()
     with open('../Data/company.csv', 'r', encoding='utf-8', newline='') as csvfile:
         rows = csv.reader(csvfile, delimiter=';')
-        count = -1
-        for row in rows:
-            count += 1
-            if count == 0:
+        for index, row in enumerate(rows):
+            if index == 0:
                 continue
             node = Node('COMPANY')
             node['stock_code'] = row[0]
@@ -54,7 +52,7 @@ def create_company():  # 在图中创建A股上市公司节点
             node['adv_ser'] = row[11]
             node['com_type'] = com_type(row[0])
             graph.create(node)
-            # print(count, row)
+            # print(index, row)
     time2 = time.time()
     print('Over: create_company', time2 - time1)
 
@@ -79,10 +77,8 @@ def create_com_to_ind():  # 在图中创建公司与行业的关系
     time1 = time.time()
     with open('../Data/com_industry_tags.csv', 'r', encoding='utf-8', newline='') as csvfile:
         rows = csv.reader(csvfile)
-        k = -1
-        for row in rows:
-            k += 1
-            if k == 0:
+        for index, row in enumerate(rows):
+            if index == 0:
                 continue
             com_node = graph.find_one(label='COMPANY', property_key='stock_code', property_value=row[0])
             ind_node = graph.find_one(label='INDUSTRY', property_key='ind_name', property_value=row[2])
@@ -92,7 +88,7 @@ def create_com_to_ind():  # 在图中创建公司与行业的关系
                 com_rel = Relationship(com_node, 'COM_BelongTo_IND', ind_node)
                 graph.create(com_rel)
             else:
-                print('Missing industry:', k, row)
+                print('Missing industry:', index, row)
                 new_node = Node('INDUSTRY')
                 new_node['ind_name'] = row[2]
                 new_node['class_system'] = '申万三级'
@@ -116,10 +112,8 @@ def create_com_block():  # 在图中创建板块节点，以及A股上市公司�
             csvpath = file_path + file
             with open(csvpath, 'r', encoding='utf-8', newline='') as csvfile:
                 rows = csv.reader(csvfile, delimiter=';')
-                k = -1
-                for row in rows:
-                    k += 1
-                    if k == 0:
+                for index, row in enumerate(rows):
+                    if index == 0:
                         continue
                     rel_num += 1
                     # print(rel_num, stock_code, '-->', row)
@@ -153,10 +147,8 @@ def create_com_output():  # 在图中创建公司产业输出关系（上下游�
                 csvpath = file_path + file
                 with open(csvpath, 'r', encoding='utf-8', newline='') as csvfile:
                     rows = csv.reader(csvfile, delimiter=';')
-                    k = -1
-                    for row in rows:
-                        k += 1
-                        if k == 0:
+                    for index, row in enumerate(rows):
+                        if index == 0:
                             continue
                         rel_num += 1
                         # print(rel_num, row, '-->', stock_code)
@@ -196,10 +188,8 @@ def create_com_output():  # 在图中创建公司产业输出关系（上下游�
                 csvpath = file_path + file
                 with open(csvpath, 'r', encoding='utf-8', newline='') as csvfile:
                     rows = csv.reader(csvfile, delimiter=';')
-                    k = -1
-                    for row in rows:
-                        k += 1
-                        if k == 0:
+                    for index, row in enumerate(rows):
+                        if index == 0:
                             continue
                         rel_num += 1
                         # print(rel_num, stock_code, '-->', row)
@@ -253,10 +243,8 @@ def create_com_invest():  # 在图中创建公司投资关系，如果公司节�
             csvpath = file_path + file
             with open(csvpath, 'r', encoding='utf-8', newline='') as csvfile:
                 rows = csv.reader(csvfile, delimiter=';')
-                k = -1
-                for row in rows:
-                    k += 1
-                    if k == 0:
+                for index, row in enumerate(rows):
+                    if index == 0:
                         continue
                     rel_num += 1
                     # print(rel_num, stock_code, '-->', row)
@@ -316,11 +304,33 @@ def create_user_to_industry():  # 在图中创建用户节点，以及用户与�
     print('Over: create_user_to_industry', time2 - time1)
 
 
+def create_inf_to_labels():  # 在图中创建资讯节点、资讯类型节点，以及资讯与资讯类型的关系
+    time1 = time.time()
+    file_path = '../Data/Information/inf_labels/'
+    files = file_name(file_path)
+    rel_num = 0
+    for file in files:  # 遍历文件夹中的所有的文件
+        if '.csv' not in file:
+            continue
+        label_name = (file.split('.'))[0]
+        label_node = Node('INF_TYPE')
+        label_node['inf_typ_name'] = label_name
+        graph.create(label_node)
+        csvpath = file_path + file
+        with open(csvpath, 'r', encoding='utf-8', newline='') as csvfile:
+            rows = csv.reader(csvfile, delimiter=';')
+            for index, row in enumerate(rows):
+                if index == 0:
+                    continue
+                if not graph.find_one(label='INFORMATION', property_key='inf_id', property_value=row[0]):
+                    inf_node = Node('INFORMATION')
+                    inf_node['inf_id'] = row[0]
+                    inf_node['inf_title'] = row[1]
+                    rel = Relationship(inf_node, 'INF_BelongTo_ITYP', label_node)
+                    graph.create(inf_node | rel)
+                    rel_num += 1
+                    print(rel_num, label_name, row)
+
+
 if __name__ == '__main__':
-    create_company()
-    create_industry()
-    create_com_to_ind()
-    create_com_block()
-    create_com_output()
-    create_com_invest()
-    create_user_to_industry()
+    create_inf_to_labels()
