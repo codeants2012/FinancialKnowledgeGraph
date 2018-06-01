@@ -304,7 +304,7 @@ def create_user_to_industry():  # 在图中创建用户节点，以及用户与�
     print('Over: create_user_to_industry', time2 - time1)
 
 
-def create_inf_to_labels():  # 在图中创建资讯节点、资讯类型节点，以及资讯与资讯类型的关系
+def create_inf_to_labels():  # 在图中创建资讯节点，以及资讯与行业的关系
     time1 = time.time()
     file_path = '../Data/Information/inf_labels/'
     files = file_name(file_path)
@@ -313,9 +313,10 @@ def create_inf_to_labels():  # 在图中创建资讯节点、资讯类型节点�
         if '.csv' not in file:
             continue
         label_name = (file.split('.'))[0]
-        label_node = Node('INF_TYPE')
-        label_node['inf_typ_name'] = label_name
-        graph.create(label_node)
+        label_node = graph.find_one(label='INDUSTRY', property_key='ind_name', property_value=label_name)
+        if not label_node:
+            print(label_name)
+            continue
         csvpath = file_path + file
         with open(csvpath, 'r', encoding='utf-8', newline='') as csvfile:
             rows = csv.reader(csvfile, delimiter=';')
@@ -326,10 +327,10 @@ def create_inf_to_labels():  # 在图中创建资讯节点、资讯类型节点�
                     inf_node = Node('INFORMATION')
                     inf_node['inf_id'] = row[0]
                     inf_node['inf_title'] = row[1]
-                    rel = Relationship(inf_node, 'INF_BelongTo_ITYP', label_node)
+                    rel = Relationship(inf_node, 'INF_ReferTo_IND', label_node)
                     graph.create(inf_node | rel)
                     rel_num += 1
-                    print(rel_num, label_name, row)
+                    # print(rel_num, label_name, row)
 
 
 if __name__ == '__main__':

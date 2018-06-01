@@ -35,3 +35,4 @@
 报告期:report_dt  
 持股比例:proportion  
 - U-FocusOn_IND  
+- INF_ReferTo_IND
