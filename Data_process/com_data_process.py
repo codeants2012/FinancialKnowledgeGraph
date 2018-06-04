@@ -1,4 +1,5 @@
 import csv
+from Graph.graph_init_create import graph, file_name, re
 
 
 def com_data_pre1():  # 爬取的公司数据-预处理1：调整字段顺序、删除多余字符
@@ -74,5 +75,222 @@ def com_data_pre3():  # 整合并排序多个文件中的公司数据
             csvwriter.writerow(row)
 
 
+def node_encoding():  # 编码所有节点
+    with open('../Data/Encoding/node_encoding.csv', 'w', encoding='utf-8', newline='') as csvfile:
+        writer = csv.writer(csvfile, delimiter='\t')
+        writer.writerow(['节点类型', '原标识', '编码'])
+        nodes = graph.find(label='USER')
+        label = 'USER'
+        for node in nodes:
+            pro1 = node['user_id']
+            pro2 = 'USER' + node['user_id'].zfill(12)
+            writer.writerow([label, pro1, pro2])
+            print(label, pro1, pro2)
+        nodes = graph.find(label='COMPANY')
+        label = 'COMPANY'
+        k = 0
+        for node in nodes:
+            pro1 = node['com_name']
+            if 'A' in node['com_type'] or 'B' in node['com_type']:
+                pro2 = 'COMP' + (node['stock_code'].split('.'))[0].zfill(12)
+            else:
+                k += 1
+                pro2 = 'COMP0001' + str(k).zfill(8)
+            writer.writerow([label, pro1, pro2])
+            print(label, pro1, pro2)
+        nodes = graph.find(label='INFORMATION')
+        label = 'INFORMATION'
+        for node in nodes:
+            pro1 = node['inf_id']
+            pro2 = 'INFO' + pro1.zfill(12)
+            writer.writerow([label, pro1, pro2])
+            print(label, pro1, pro2)
+        nodes = graph.find(label='INDUSTRY')
+        label = 'INDUSTRY'
+        for node in nodes:
+            pro1 = node['ind_name']
+            pro2 = 'INDU' + node['ind_code'].zfill(12)
+            writer.writerow([label, pro1, pro2])
+            print(label, pro1, pro2)
+        nodes = graph.find(label='BLOCK')
+        label = 'BLOCK'
+        k = 0
+        for node in nodes:
+            pro1 = node['block_name']
+            k += 1
+            pro2 = 'BLOC' + str(k).zfill(12)
+            writer.writerow([label, pro1, pro2])
+            print(label, pro1, pro2)
+
+
+def edge_formatting():  # 抽取所有边，并依照节点编码格式化
+    d = dict()
+    k = 0
+    with open('../Data/Encoding/node_encoding.csv', 'r', encoding='utf-8', newline='') as csvfile:
+        rows = csv.reader(csvfile, delimiter='\t')
+        for index, row in enumerate(rows):
+            if index == 0:
+                continue
+            d[row[1]] = row[2]
+
+    with open('../Data/Encoding/six_with_edgetype.edgelist', 'w', encoding='utf-8', newline='') as edgelist:
+        edgewriter = csv.writer(edgelist, delimiter='\t')
+        with open('../Data/com_industry_tags.csv', 'r', encoding='utf-8', newline='') as csvfile:
+            rows = csv.reader(csvfile)
+            for index, row in enumerate(rows):
+                if index == 0:
+                    continue
+                try:
+                    node1 = d[row[0]]
+                    node2 = d[row[2]]
+                    edgetype = {'edgetype': 'COM_BelongTo_IND'}
+                    edge = [node1, node2, edgetype]
+                    edgewriter.writerow(edge)
+                    k += 1
+                    print(k, edge)
+                except:
+                    continue
+
+        file_path = '../Data/AStack_com_block/'
+        files = file_name(file_path)
+        for file in files:  # 遍历文件夹中的所有的文件
+            if '.csv' not in file:
+                continue
+            stock_code = ((file.split('['))[1].split(']'))[0]
+            node = graph.find_one(label='COMPANY', property_key='stock_code', property_value=stock_code)
+            if node:
+                csvpath = file_path + file
+                with open(csvpath, 'r', encoding='utf-8', newline='') as csvfile:
+                    rows = csv.reader(csvfile, delimiter=';')
+                    for index, row in enumerate(rows):
+                        if index == 0:
+                            continue
+                        try:
+                            node1 = d[node['com_name']]
+                            node2 = d[row[0]]
+                            edgetype = {'edgetype': 'COM_BelongTo_B'}
+                            edge = [node1, node2, edgetype]
+                            edgewriter.writerow(edge)
+                            k += 1
+                            print(k, edge)
+                        except:
+                            continue
+
+        file_path = '../Data/AStack_com_output/'
+        files = file_name(file_path)
+        for file in files:  # 遍历文件夹中的所有的文件
+            if '.csv' not in file:
+                continue
+            stock_code = ((file.split('['))[1].split(']'))[0]
+            node = graph.find_one(label='COMPANY', property_key='stock_code', property_value=stock_code)
+            if node:
+                if '上游' in file:  # 上游公司
+                    csvpath = file_path + file
+                    with open(csvpath, 'r', encoding='utf-8', newline='') as csvfile:
+                        rows = csv.reader(csvfile, delimiter=';')
+                        for index, row in enumerate(rows):
+                            if index == 0:
+                                continue
+                            try:
+                                node1 = d[row[0]]
+                                node2 = d[node['com_name']]
+                                edgetype = {'edgetype': 'COM_Output_COM'}
+                                edge = [node1, node2, edgetype]
+                                edgewriter.writerow(edge)
+                                k += 1
+                                print(k, edge)
+                            except:
+                                continue
+                if '下游' in file:  # 下游公司
+                    csvpath = file_path + file
+                    with open(csvpath, 'r', encoding='utf-8', newline='') as csvfile:
+                        rows = csv.reader(csvfile, delimiter=';')
+                        for index, row in enumerate(rows):
+                            if index == 0:
+                                continue
+                            try:
+                                node1 = d[node['com_name']]
+                                node2 = d[row[0]]
+                                edgetype = {'edgetype': 'COM_Output_COM'}
+                                edge = [node1, node2, edgetype]
+                                edgewriter.writerow(edge)
+                                k += 1
+                                print(k, edge)
+                            except:
+                                continue
+
+        file_path = '../Data/AStack_com_invest/'
+        files = file_name(file_path)
+        for file in files:  # 遍历文件夹中的所有的文件
+            if '.csv' not in file:
+                continue
+            stock_code = ((file.split('['))[1].split(']'))[0]
+            node = graph.find_one(label='COMPANY', property_key='stock_code', property_value=stock_code)
+            if node:
+                csvpath = file_path + file
+                with open(csvpath, 'r', encoding='utf-8', newline='') as csvfile:
+                    rows = csv.reader(csvfile, delimiter=';')
+                    for index, row in enumerate(rows):
+                        if index == 0:
+                            continue
+                        try:
+                            node1 = d[node['com_name']]
+                            node2 = d[row[0]]
+                            edgetype = {'edgetype': 'COM_Invest_COM'}
+                            edge = [node1, node2, edgetype]
+                            edgewriter.writerow(edge)
+                            k += 1
+                            print(k, edge)
+                        except:
+                            continue
+
+        with open('../Data/User/user_labels_ind.txt', mode='r', encoding='utf-8', newline='') as txtfile:
+            rows = txtfile.readlines()
+            for row in rows:
+                pattern = re.compile(r'\d+')
+                res = re.findall(pattern, row)
+                node1 = d[res[0]]
+                codes = res[1:]
+                for code in codes:
+                    node2 = d[code]
+                    edgetype = {'edgetype': 'U_FocusOn_IND'}
+                    edge = [node1, node2, edgetype]
+                    edgewriter.writerow(edge)
+                    k += 1
+                    print(k, edge)
+
+        file_path = '../Data/Information/inf_labels/'
+        files = file_name(file_path)
+        for file in files:  # 遍历文件夹中的所有的文件
+            if '.csv' not in file:
+                continue
+            label_name = (file.split('.'))[0]
+            csvpath = file_path + file
+            with open(csvpath, 'r', encoding='utf-8', newline='') as csvfile:
+                rows = csv.reader(csvfile, delimiter=';')
+                for index, row in enumerate(rows):
+                    if index == 0:
+                        continue
+                    try:
+                        node1 = d[row[0]]
+                        node2 = d[label_name]
+                        edgetype = {'edgetype': 'INF_ReferTo_IND'}
+                        edge = [node1, node2, edgetype]
+                        edgewriter.writerow(edge)
+                        k += 1
+                        print(k, edge)
+                    except:
+                        continue
+
+
+def edgelist_process():  # 边列表处理
+    with open('../Data/Encoding/six_with_edgetype.edgelist', 'r', encoding='utf-8', newline='') as edgelist1, \
+            open('../Data/Encoding/six.edgelist', 'w', encoding='utf-8', newline='') as edgelist2:
+        edgewreader = csv.reader(edgelist1, delimiter='\t')
+        edgewriter = csv.writer(edgelist2, delimiter='\t')
+        for row in edgewreader:
+            edgewriter.writerow(row[0:2])
+
+
 if __name__ == '__main__':
-    com_data_pre3()
+    edgelist_process()

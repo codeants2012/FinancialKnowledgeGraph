@@ -331,6 +331,8 @@ def create_inf_to_labels():  # 在图中创建资讯节点，以及资讯与行�
                     graph.create(inf_node | rel)
                     rel_num += 1
                     # print(rel_num, label_name, row)
+    time2 = time.time()
+    print('Over: create_inf_to_labels', time2 - time1)
 
 
 if __name__ == '__main__':

@@ -23,8 +23,6 @@
 - INFORMATION  
 资讯ID:inf_id  
 资讯标题:inf_title  
-- INF_TYPE  
-资讯类型名称:inf_typ_name  
 
 ## 关系  
 - COM_BelongTo_IND  
