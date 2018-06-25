@@ -11,7 +11,7 @@ def Con_Neo4j(http=None, username=None, password=None):
     :param password: 密码
     :return: 返回数据库链接
     """
-    connection = Graph(http, username=username, password=password)  # 连接图数据库
+    connection = Graph(http, user=username, password=password, bolt=True)  # 连接图数据库
     print('Neo4j Connect successful!')
     return connection
 

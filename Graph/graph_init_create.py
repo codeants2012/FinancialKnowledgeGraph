@@ -1,7 +1,7 @@
 from Graph.process import Con_Neo4j
 from py2neo import Relationship, Node
 import csv
-from Data_process.com_data_extraction import file_name
+from Data_process.data_extraction import file_name
 import re
 import time
 
@@ -44,7 +44,7 @@ def create_company():  # 在图中创建A股上市公司节点
             node['eng_name'] = row[3]
             node['found_dt'] = row[4]
             node['reg_prov'] = row[5]
-            node['old_nmae'] = row[6]
+            node['old_name'] = row[6]
             node['legal_rep'] = row[7]
             node['ind_dir'] = row[8]
             node['acc_firm'] = row[9]
@@ -286,7 +286,7 @@ def create_com_invest():  # 在图中创建公司投资关系，如果公司节�
 
 def create_user_to_industry():  # 在图中创建用户节点，以及用户与行业的关系
     time1 = time.time()
-    with open('../Data/User/user_labels_ind.txt', mode='r', encoding='utf-8', newline='') as txtfile:
+    with open('../Data/User/user_1000_labels_2-8_ind.txt', mode='r', encoding='utf-8', newline='') as txtfile:
         rows = txtfile.readlines()
         for row in rows:
             pattern = re.compile(r'\d+')
@@ -336,4 +336,12 @@ def create_inf_to_labels():  # 在图中创建资讯节点，以及资讯与行�
 
 
 if __name__ == '__main__':
-    create_inf_to_labels()
+    # create_company()
+    # create_industry()
+    # create_com_to_ind()
+    # create_com_block()
+    # create_com_output()
+    # create_com_invest()
+    # create_user_to_industry()
+    # create_inf_to_labels()
+    print('66')

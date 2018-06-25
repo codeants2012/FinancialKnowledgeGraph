@@ -6,7 +6,7 @@
 公司英文名称:eng_name  
 成立日期:found_dt  
 所属地域:reg_prov  
-曾用名:old_nmae  
+曾用名:old_name  
 法定代表人:legal_rep  
 独立董事:ind_dir  
 会计师事务所:acc_firm  
