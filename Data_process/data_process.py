@@ -76,16 +76,16 @@ def com_data_pre3():  # 整合并排序多个文件中的公司数据
 
 
 def node_encoding():  # 编码所有节点
-    with open('../Data/Encoding/node_encoding.csv', 'w', encoding='utf-8', newline='') as csvfile:
+    with open('../Data/Encoding/com_node.csv', 'w', encoding='utf-8', newline='') as csvfile:
         writer = csv.writer(csvfile, delimiter='\t')
         writer.writerow(['节点类型', '原标识', '编码'])
-        nodes = graph.find(label='USER')
-        label = 'USER'
-        for node in nodes:
-            pro1 = node['user_id']
-            pro2 = 'USER' + node['user_id'].zfill(12)
-            writer.writerow([label, pro1, pro2])
-            print(label, pro1, pro2)
+        # nodes = graph.find(label='USER')
+        # label = 'USER'
+        # for node in nodes:
+        #     pro1 = node['user_id']
+        #     pro2 = 'USER' + node['user_id'].zfill(12)
+        #     writer.writerow([label, pro1, pro2])
+        #     print(label, pro1, pro2)
         nodes = graph.find(label='COMPANY')
         label = 'COMPANY'
         k = 0
@@ -98,13 +98,13 @@ def node_encoding():  # 编码所有节点
                 pro2 = 'COMP0001' + str(k).zfill(8)
             writer.writerow([label, pro1, pro2])
             print(label, pro1, pro2)
-        nodes = graph.find(label='INFORMATION')
-        label = 'INFORMATION'
-        for node in nodes:
-            pro1 = node['inf_id']
-            pro2 = 'INFO' + pro1.zfill(12)
-            writer.writerow([label, pro1, pro2])
-            print(label, pro1, pro2)
+        # nodes = graph.find(label='INFORMATION')
+        # label = 'INFORMATION'
+        # for node in nodes:
+        #     pro1 = node['inf_id']
+        #     pro2 = 'INFO' + pro1.zfill(12)
+        #     writer.writerow([label, pro1, pro2])
+        #     print(label, pro1, pro2)
         nodes = graph.find(label='INDUSTRY')
         label = 'INDUSTRY'
         for node in nodes:
@@ -126,14 +126,14 @@ def node_encoding():  # 编码所有节点
 def edge_formatting():  # 抽取所有边，并依照节点编码格式化
     d = dict()
     k = 0
-    with open('../Data/Encoding/node_encoding.csv', 'r', encoding='utf-8', newline='') as csvfile:
+    with open('../Data/Encoding/com_node.csv', 'r', encoding='utf-8', newline='') as csvfile:
         rows = csv.reader(csvfile, delimiter='\t')
         for index, row in enumerate(rows):
             if index == 0:
                 continue
             d[row[1]] = row[2]
 
-    with open('../Data/Encoding/edge_with_edgetype.edgelist', 'w', encoding='utf-8', newline='') as edgelist:
+    with open('../Data/Encoding/com_edge_with_edgetype.edgelist', 'w', encoding='utf-8', newline='') as edgelist:
         edgewriter = csv.writer(edgelist, delimiter='\t')
         with open('../Data/com_industry_tags.csv', 'r', encoding='utf-8', newline='') as csvfile:
             rows = csv.reader(csvfile)
@@ -244,48 +244,48 @@ def edge_formatting():  # 抽取所有边，并依照节点编码格式化
                         except:
                             continue
 
-        with open('../Data/User/user_1000_labels_2-8_ind.txt', mode='r', encoding='utf-8', newline='') as txtfile:
-            rows = txtfile.readlines()
-            for row in rows:
-                pattern = re.compile(r'\d+')
-                res = re.findall(pattern, row)
-                node1 = d[res[0]]
-                codes = res[1:]
-                for code in codes:
-                    node2 = d[code]
-                    edgetype = {'edgetype': 'U_FocusOn_IND'}
-                    edge = [node1, node2, edgetype]
-                    edgewriter.writerow(edge)
-                    k += 1
-                    print(k, edge)
-
-        file_path = '../Data/Information/inf_labels/'
-        files = file_name(file_path)
-        for file in files:  # 遍历文件夹中的所有的文件
-            if '.csv' not in file:
-                continue
-            label_name = (file.split('.'))[0]
-            csvpath = file_path + file
-            with open(csvpath, 'r', encoding='utf-8', newline='') as csvfile:
-                rows = csv.reader(csvfile, delimiter=';')
-                for index, row in enumerate(rows):
-                    if index == 0:
-                        continue
-                    try:
-                        node1 = d[row[0]]
-                        node2 = d[label_name]
-                        edgetype = {'edgetype': 'INF_ReferTo_IND'}
-                        edge = [node1, node2, edgetype]
-                        edgewriter.writerow(edge)
-                        k += 1
-                        print(k, edge)
-                    except:
-                        continue
+        # with open('../Data/User/user_1000_labels_2-8_ind.txt', mode='r', encoding='utf-8', newline='') as txtfile:
+        #     rows = txtfile.readlines()
+        #     for row in rows:
+        #         pattern = re.compile(r'\d+')
+        #         res = re.findall(pattern, row)
+        #         node1 = d[res[0]]
+        #         codes = res[1:]
+        #         for code in codes:
+        #             node2 = d[code]
+        #             edgetype = {'edgetype': 'U_FocusOn_IND'}
+        #             edge = [node1, node2, edgetype]
+        #             edgewriter.writerow(edge)
+        #             k += 1
+        #             print(k, edge)
+        #
+        # file_path = '../Data/Information/inf_labels/'
+        # files = file_name(file_path)
+        # for file in files:  # 遍历文件夹中的所有的文件
+        #     if '.csv' not in file:
+        #         continue
+        #     label_name = (file.split('.'))[0]
+        #     csvpath = file_path + file
+        #     with open(csvpath, 'r', encoding='utf-8', newline='') as csvfile:
+        #         rows = csv.reader(csvfile, delimiter=';')
+        #         for index, row in enumerate(rows):
+        #             if index == 0:
+        #                 continue
+        #             try:
+        #                 node1 = d[row[0]]
+        #                 node2 = d[label_name]
+        #                 edgetype = {'edgetype': 'INF_ReferTo_IND'}
+        #                 edge = [node1, node2, edgetype]
+        #                 edgewriter.writerow(edge)
+        #                 k += 1
+        #                 print(k, edge)
+        #             except:
+        #                 continue
 
 
 def edgelist_process():  # 边列表处理
-    with open('../Data/Encoding/edge_with_edgetype.edgelist', 'r', encoding='utf-8', newline='') as edgelist1, \
-            open('../Data/Encoding/edge.edgelist', 'w', encoding='utf-8', newline='') as edgelist2:
+    with open('../Data/Encoding/com_edge_with_edgetype.edgelist', 'r', encoding='utf-8', newline='') as edgelist1, \
+            open('../Data/Encoding/com_edge.edgelist', 'w', encoding='utf-8', newline='') as edgelist2:
         edgewreader = csv.reader(edgelist1, delimiter='\t')
         edgewriter = csv.writer(edgelist2, delimiter='\t')
         for row in edgewreader:
