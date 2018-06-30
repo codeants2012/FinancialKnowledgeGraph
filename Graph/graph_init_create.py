@@ -336,12 +336,11 @@ def create_inf_to_labels():  # 在图中创建资讯节点，以及资讯与行�
 
 
 if __name__ == '__main__':
-    # create_company()
-    # create_industry()
-    # create_com_to_ind()
-    # create_com_block()
-    # create_com_output()
-    # create_com_invest()
+    create_company()
+    create_industry()
+    create_com_to_ind()
+    create_com_block()
+    create_com_output()
+    create_com_invest()
     # create_user_to_industry()
     # create_inf_to_labels()
-    print('66')
