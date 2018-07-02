@@ -56,7 +56,7 @@ def com_data_pre2():  # 爬取的公司数据-预处理2：解决部分数据字
 def com_data_pre3():  # 整合并排序多个文件中的公司数据
     with open('../Data/company.csv', 'r', encoding='utf-8', newline='') as csv1, \
             open('../Data/add_company.csv', 'r', encoding='utf-8', newline='') as csv2, \
-            open('../Data/company1.csv', 'w', encoding='utf-8', newline='') as csv3:
+            open('../Data/company.csv', 'w', encoding='utf-8', newline='') as csv3:
         rows1 = csv.reader(csv1, delimiter=';')
         rows2 = csv.reader(csv2, delimiter=';')
         csvwriter = csv.writer(csv3, delimiter=';')

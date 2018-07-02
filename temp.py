@@ -10,7 +10,8 @@ graph = Con_Neo4j(http='http://127.0.0.1:7474', username='neo4j', password='1234
 
 
 if __name__ == '__main__':
-    with open('Data/AStack_com_invest.csv') as csvfile:
-        rows = csv.reader(csvfile, delimiter='\t')
+    with open('Data/company.csv', mode='r', encoding='utf-8', newline='') as csvfile, open('Data/company1.csv', mode='w', encoding='utf-8', newline='') as csvfile2:
+        rows = csv.reader(csvfile, delimiter=';')
+        writer = csv.writer(csvfile2, delimiter='\t')
         for row in rows:
-            print(row)
+            writer.writerow(row)
