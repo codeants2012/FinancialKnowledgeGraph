@@ -76,7 +76,7 @@ def com_data_pre3():  # 整合并排序多个文件中的公司数据
 
 
 def node_encoding():  # 编码所有节点
-    with open('../Data/Encoding/com_node.csv', 'w', encoding='utf-8', newline='') as csvfile:
+    with open('../Data/Export/com_node.csv', 'w', encoding='utf-8', newline='') as csvfile:
         writer = csv.writer(csvfile, delimiter='\t')
         writer.writerow(['节点类型', '原标识', '编码'])
         # nodes = graph.find(label='USER')
@@ -126,14 +126,14 @@ def node_encoding():  # 编码所有节点
 def edge_formatting():  # 抽取所有边，并依照节点编码格式化
     d = dict()
     k = 0
-    with open('../Data/Encoding/com_node.csv', 'r', encoding='utf-8', newline='') as csvfile:
+    with open('../Data/Export/com_node.csv', 'r', encoding='utf-8', newline='') as csvfile:
         rows = csv.reader(csvfile, delimiter='\t')
         for index, row in enumerate(rows):
             if index == 0:
                 continue
             d[row[1]] = row[2]
 
-    with open('../Data/Encoding/com_edge_with_edgetype.edgelist', 'w', encoding='utf-8', newline='') as edgelist:
+    with open('../Data/Export/com_edge_with_edgetype.edgelist', 'w', encoding='utf-8', newline='') as edgelist:
         edgewriter = csv.writer(edgelist, delimiter='\t')
         with open('../Data/com_industry_tags.csv', 'r', encoding='utf-8', newline='') as csvfile:
             rows = csv.reader(csvfile)
@@ -284,8 +284,8 @@ def edge_formatting():  # 抽取所有边，并依照节点编码格式化
 
 
 def edgelist_process():  # 边列表处理
-    with open('../Data/Encoding/com_edge_with_edgetype.edgelist', 'r', encoding='utf-8', newline='') as edgelist1, \
-            open('../Data/Encoding/com_edge.edgelist', 'w', encoding='utf-8', newline='') as edgelist2:
+    with open('../Data/Export/com_edge_with_edgetype.edgelist', 'r', encoding='utf-8', newline='') as edgelist1, \
+            open('../Data/Export/com_edge.edgelist', 'w', encoding='utf-8', newline='') as edgelist2:
         edgewreader = csv.reader(edgelist1, delimiter='\t')
         edgewriter = csv.writer(edgelist2, delimiter='\t')
         for row in edgewreader:

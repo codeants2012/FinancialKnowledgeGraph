@@ -1,12 +1,12 @@
-from Graph.process import Con_Neo4j
-from py2neo import Relationship, Node
+from py2neo import Graph, Node, Relationship
 import csv
 from Data_process.data_extraction import file_name
 import re
 import time
 
 
-graph = Con_Neo4j(http='http://127.0.0.1:7474', username='neo4j', password='123456')
+# 连接图数据库
+graph = Graph('http://127.0.0.1:7474', username='neo4j', password='123456', bolt=True, secure=False)
 
 
 def com_type(code):  # 识别公司代码所属类别，包括：深A、沪A、深B、沪B、三板、其它、非上市
